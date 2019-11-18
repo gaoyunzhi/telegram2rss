@@ -1,0 +1,5 @@
+python-telegram-bot
+pyyaml
+telegram_util>=0.0.10
+CherryPy
+feedgen
