@@ -1,6 +1,6 @@
 # telegram_2_rss
 
-Telegram channel to RSS feed.
+Telegram channel stream to RSS feed.
 
 # note
 
