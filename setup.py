@@ -1,10 +1,10 @@
 import os
 import sys
 
-REQUIRED_KEYS = set(['bot_token', 'twitter_consumer_key', 'twitter_consumer_secret', 'twitter_access_token', 'twitter_access_secret'])
-
 def setup(arg = ''):
-	RUN_COMMAND = 'nohup python3 -u post_twitter.py &'
+	os.system('mkdir rss')
+	
+	RUN_COMMAND = 'nohup python3 -u to_rss.py &'
 
 	if arg != 'debug':
 		r = os.system('sudo pip3 install -r requirements.txt')
@@ -19,7 +19,7 @@ def setup(arg = ''):
 		os.system('sudo pip3 install python-telegram-bot --upgrade') # need to use some experiement feature, e.g. message filtering
 			
 	# kill the old running bot if any. If you need two same bot running in one machine, use mannual command instead
-	os.system("ps aux | grep ython | grep 'post_twitter.py' | awk '{print $2}' | xargs kill -9")
+	os.system("ps aux | grep ython | grep 'to_rss.py' | awk '{print $2}' | xargs kill -9")
 
 	if arg.startswith('debug'):
 		os.system(RUN_COMMAND[6:-2])
