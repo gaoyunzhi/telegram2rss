@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from telegram.ext import Updater, MessageHandler, Filters
-from telegram_util import addToQueue, log_on_fail, getFilePath
+from telegram_util import addToQueue, log_on_fail, getFilePath, getLinkFromMsg
 import threading
 import yaml
+from feedgen.feed import FeedGenerator
+from lxml import etree
 
 INTERVAL = 1
+LIMIT = 10
 
 with open('CREDENTIALS') as f:
 	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
@@ -21,13 +24,41 @@ with open('SUBSCRIPTION') as f:
 test_channel = -1001159399317
 EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 
-def appendRss_(rss_name, file, text):
-	with open('rss/' + rss_name + '.xml', 'a') as f:
-		f.write('test: ' + str(text) + '\n') # TODO
+def getFeedChannel(rss_detail):
+	fg = FeedGenerator()
+	fg.title(rss_detail['title'])
+    fg.link(rss_detail['link'], rel='self')
+    fg.description(rss_detail['description'])
+    return fg
+
+for k, v in SUBSCRIPTION.items():
+	SUBSCRIPTION[k]['channel'] = getFeedChannel(v)
+
+def getMsgLink(msg):
+	return 't.me/' + msg.chat.username + '/' + str(msg.message_id)
+
+def editFeedEntry(item, msg):
+	item.id = getMsgLink(msg)
+    item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
+    item.description(msg.text or getFilePath(msg))
+
+def getEntry(fg, msg):
+	for entry in fg.__feed_entries:
+		if entry.id = getMsgLink(msg):
+			return entry
+	if len(fg.__feed_entries) > LIMIT:
+		fg.__feed_entries.pop(0)
+	return fg.add_entry()
+
+def appendRss_(rss_name, msg):
+	filename = 'rss/' + rss_name + '.xml'
+	fg = SUBSCRIPTION[rss_name]['channel']
+	item = getEntry(fg, msg)
+	editFeedEntry(fg, msg)
 
 def getSubscription(chat_id):
-	for rss_name, subscriptions in SUBSCRIPTION.items():
-		if chat_id in subscriptions:
+	for rss_name, detail in SUBSCRIPTION.items():
+		if chat_id == detail['subscription']:
 			yield rss_name
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
@@ -38,7 +69,7 @@ def apendRss(chat_id, msg_id):
 	r = tele.bot.forward_message(
 		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
 	for rss_name in rss_names:
-		appendRss_(rss_name, getFilePath(r), r.text)
+		appendRss_(rss_name, r)
 	print(msg_id)
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)

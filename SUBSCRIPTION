@@ -1,1 +1,5 @@
-{social_justice: [-1001409716127]}
+social_justice:
+	subscription: -1001409716127
+	title: 平权观察
+	link: 'https://t.me/equality_and_rights'
+	description: '女权，同权（LGBTQ权利），和劳工权利等。科普相关的社科知识和最新动态。'
