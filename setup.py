@@ -32,7 +32,8 @@ def setup(arg = ''):
 
 	template = "nohup python3 -u %s.py &"
 	for f in RUN_FILES:
-		os.system(template % f)
+		if os.system(template % f) != 0:
+			os.system('sudo ' + template % f)
 
 	if arg.startswith('debug'):
 		signal(SIGINT, kill)
