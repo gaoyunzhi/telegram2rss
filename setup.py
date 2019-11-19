@@ -11,7 +11,9 @@ def kill():
 		os.system(template % f)
 
 def onExit():
+	print('EXITING')
 	kill()
+	print('EXIT')
 	exit(0)
 
 def setup(arg = ''):
