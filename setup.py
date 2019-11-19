@@ -29,8 +29,6 @@ def setup(arg = ''):
 		from telegram.ext import Updater, MessageHandler, Filters
 	except:
 		os.system('sudo pip3 install python-telegram-bot --upgrade') # need to use some experiement feature, e.g. message filtering
-			
-	kill()
 
 	template = "nohup python3 -u %s.py &"
 	for f in RUN_FILES:
