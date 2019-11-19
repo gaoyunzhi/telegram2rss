@@ -21,33 +21,38 @@ with open('SUBSCRIPTION') as f:
 test_channel = -1001159399317
 EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 
-def appendRss(rss_name, msg):
+def appendRss_(rss_name, file, text):
 	with open('rss/' + rss_name + '.xml', 'a') as f:
 		f.write('test\n') # TODO
+
+@log_on_fail(debug_group, EXPECTED_ERRORS)
+def apendRss(chat_id, msg_id):
+	rss_names = list(getSubscription(chat_id))
+	if not rss_names:
+		return
+	r = tele.bot.forward_message(
+		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
+	for rss_name in rss_names:
+		appendRss_(rss_name, getFilePath(r), r.text)
+
+def getSubscription(chat_id)
+	for rss_name, subscriptions in SUBSCRIPTION:
+		if chat_id in subscriptions:
+			yield rss_name
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def _manageMsg(update):
 	msg = update.effective_message
 	if not msg or not msg.chat:
 		return
-	r = None
-	for rss_name, subscriptions in SUBSCRIPTION:
-		if msg.chat.id in subscriptions:
-			if not r:
-				r = msg.forward(test_channel)
-			appendRss(rss_name, r)
+	apendRss(msg.chat_id, msg.message_id)
 
 @log_on_fail(debug_group)
 def manageMsg(update, context):
-	threading.Timer(LOOP_INTERVAL, _manageMsg).start() 
+	threading.Timer(INTERVAL, _manageMsg).start() 
 
-@log_on_fail(debug_group, EXPECTED_ERRORS)
-def backfill(chat_id, msg_id):
-	r = tele.bot.forward_message(
-		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
-
-for msg_id in range(300):
-	backfill(-1001409716127, msg_id)
+for msg_id in range(30):
+	apendRss(-1001409716127, msg_id)
 
 tele.dispatcher.add_handler(MessageHandler(Filters.update.channel_posts, manageMsg))
 
