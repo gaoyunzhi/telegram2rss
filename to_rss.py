@@ -9,7 +9,7 @@ import yaml
 INTERVAL = 1
 
 with open('CREDENTIALS') as f:
-	CREDENTIALS = json.load(f)
+	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
 
 tele = Updater(CREDENTIALS['bot_token'], use_context=True)
 r = tele.bot.send_message(-1001198682178, 'start')
@@ -25,6 +25,11 @@ def appendRss_(rss_name, file, text):
 	with open('rss/' + rss_name + '.xml', 'a') as f:
 		f.write('test\n') # TODO
 
+def getSubscription(chat_id):
+	for rss_name, subscriptions in SUBSCRIPTION:
+		if chat_id in subscriptions:
+			yield rss_name
+
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def apendRss(chat_id, msg_id):
 	rss_names = list(getSubscription(chat_id))
@@ -34,11 +39,6 @@ def apendRss(chat_id, msg_id):
 		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
 	for rss_name in rss_names:
 		appendRss_(rss_name, getFilePath(r), r.text)
-
-def getSubscription(chat_id)
-	for rss_name, subscriptions in SUBSCRIPTION:
-		if chat_id in subscriptions:
-			yield rss_name
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def _manageMsg(update):
