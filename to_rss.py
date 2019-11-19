@@ -24,15 +24,12 @@ with open('SUBSCRIPTION') as f:
 test_channel = -1001159399317
 EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 
-def getFeedChannel(rss_detail):
+def getFeedChannel(chat):
 	fg = FeedGenerator()
-	fg.title(rss_detail['title'])
-    fg.link(rss_detail['link'], rel='self')
-    fg.description(rss_detail['description'])
+	fg.title(chat.title)
+    fg.link('t.me/' + chat.username)
+    fg.description(chat.description or chat.title)
     return fg
-
-for k, v in SUBSCRIPTION.items():
-	SUBSCRIPTION[k]['channel'] = getFeedChannel(v)
 
 def getMsgLink(msg):
 	return 't.me/' + msg.chat.username + '/' + str(msg.message_id)
@@ -55,6 +52,7 @@ def appendRss_(rss_name, msg):
 	fg = SUBSCRIPTION[rss_name]['channel']
 	item = getEntry(fg, msg)
 	editFeedEntry(fg, msg)
+	fg.rss_file(filename)
 
 def getSubscription(chat_id):
 	for rss_name, detail in SUBSCRIPTION.items():
@@ -70,7 +68,6 @@ def apendRss(chat_id, msg_id):
 		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
 	for rss_name in rss_names:
 		appendRss_(rss_name, r)
-	print(msg_id)
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def _manageMsg(update):
@@ -83,8 +80,13 @@ def _manageMsg(update):
 def manageMsg(update, context):
 	threading.Timer(INTERVAL, lambda: _manageMsg(update)).start() 
 
-for msg_id in range(10):
-	apendRss(-1001409716127, msg_id)
+for k, v in SUBSCRIPTION.items():
+	chat_id = SUBSCRIPTION[k]['subscription']
+	r = tele.bot.send_message(chat_id = chat_id, text = 'test')
+	r.delete()
+	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
+	for msg_id in range(r.message_id - LIMIT * 2, r.message_id):
+		apendRss(chat_id, msg_id)
 
 tele.dispatcher.add_handler(MessageHandler(Filters.update.channel_posts, manageMsg))
 
