@@ -41,7 +41,7 @@ def editFeedEntry(item, msg, msg_id):
 def getEntry(subscription, msg_id):
 	entries = subscription['entries']
 	fg = subscription['channel']
-	if mid, entry in entries:
+	for mid, entry in entries:
 		if mid == msg_id:
 			return entry
 	if len(entries) > LIMIT:
