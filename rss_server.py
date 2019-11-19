@@ -31,11 +31,11 @@ root.rss = Rss()
 
 conf = {
 	'global': {
-		'server.socket_host': CREDENTIALS['host'],
+		'server.socket_host': '0.0.0.0',
 		'server.socket_port': CREDENTIALS['port'],
 		'server.ssl_module': 'builtin',
-		# 'server.ssl_certificate': './webhook_cert.pem',
-		# 'server.ssl_private_key': './webhook_pkey.pem',
+		'server.ssl_certificate': './webhook_cert.pem',
+		'server.ssl_private_key': './webhook_pkey.pem',
 		'engine.autoreload.on': False
 	},
 	'/': {
