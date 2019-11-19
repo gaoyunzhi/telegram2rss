@@ -28,7 +28,7 @@ EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 def getFeedChannel(rss_name, chat):
 	fg = FeedGenerator()
 	fg.title(chat.title)
-	fg.link('%s/rss/%s.xml' % (CREDENTIALS['host'], rss_name), rel='self')
+	fg.link(href = '%s/rss/%s.xml' % (CREDENTIALS['host'], rss_name), rel='self')
 	fg.description(chat.description or chat.title)
 	return fg
 
