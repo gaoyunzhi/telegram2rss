@@ -33,7 +33,7 @@ def getFeedChannel(chat):
 	return fg
 
 def editFeedEntry(item, msg, msg_id):
-	item.guid(msg_id)
+	item.guid(str(msg_id))
 	print(msg_id, getLinkFromMsg(msg))
 	item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
 	item.description(msg.text or getFilePath(msg))
