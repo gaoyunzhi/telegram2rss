@@ -7,9 +7,11 @@ import threading
 import yaml
 from feedgen.feed import FeedGenerator
 from lxml import etree
+import os
 
 INTERVAL = 1
 LIMIT = 3
+REWIND = 20 # LIMIT * 2
 
 with open('CREDENTIALS') as f:
 	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
@@ -37,7 +39,7 @@ def editFeedEntry(item, msg, msg_id):
 	item.description(msg.text or getFilePath(msg))
 
 def getEntry(subscription, msg_id):
-	entris = subscription['entries']
+	entries = subscription['entries']
 	fg = subscription['channel']
 	for entry in entries:
 		if entry.id == msg_id:
@@ -55,8 +57,9 @@ def appendRss_(rss_name, msg, msg_id):
 	fg = SUBSCRIPTION[rss_name]['channel']
 	item = getEntry(subscription, msg_id)
 	editFeedEntry(item, msg, msg_id)
+	print(len(subscription['entries']))
 	fg.rss_file(filename)
-	print('here')
+	
 
 def getSubscription(chat_id):
 	for rss_name, detail in SUBSCRIPTION.items():
@@ -70,9 +73,9 @@ def apendRss(chat_id, msg_id):
 		return
 	r = tele.bot.forward_message(
 		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
-	return
 	for rss_name in rss_names:
 		appendRss_(rss_name, r, msg_id)
+
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def _manageMsg(update):
@@ -92,7 +95,7 @@ for k, v in SUBSCRIPTION.items():
 	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
 	SUBSCRIPTION[k]['entries'] = []
 	SUBSCRIPTION[k]['link'] = 't.me/' + r.chat.username
-	for msg_id in range(r.message_id - LIMIT * 2, r.message_id):
+	for msg_id in range(r.message_id - REWIND, r.message_id):
 		apendRss(chat_id, msg_id)
 
 tele.dispatcher.add_handler(MessageHandler(Filters.update.channel_posts, manageMsg))
