@@ -6,7 +6,7 @@ from sys import exit
 RUN_FILES = ['to_rss', 'rss_server']
 
 def kill():
-	template = "ps aux | grep ython | grep '%s.py' | awk '{print $2}' | xargs kill -9"
+	template = "sudo ps aux | grep ython | grep '%s.py' | awk '{print $2}' | xargs kill -9"
 	for f in RUN_FILES:
 		os.system(template % f)
 	exit(0)
