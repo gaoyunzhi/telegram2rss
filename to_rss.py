@@ -57,7 +57,9 @@ def appendRss_(rss_name, msg, msg_id):
 	fg = SUBSCRIPTION[rss_name]['channel']
 	item = getEntry(subscription, msg_id)
 	editFeedEntry(item, msg, msg_id)
+	print('[DEBUG] saving file')
 	fg.rss_file(filename)
+	print('[DEBUG] file saved')
 	
 
 def getSubscription(chat_id):
