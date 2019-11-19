@@ -10,7 +10,7 @@ import os
 
 INTERVAL = 1
 LIMIT = 3
-REWIND = 30 # LIMIT * 2
+REWIND = 60 # LIMIT * 2
 
 with open('CREDENTIALS') as f:
 	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
