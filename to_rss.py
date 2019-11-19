@@ -57,7 +57,6 @@ def appendRss_(rss_name, msg, msg_id):
 	fg = SUBSCRIPTION[rss_name]['channel']
 	item = getEntry(subscription, msg_id)
 	editFeedEntry(item, msg, msg_id)
-	print(len(subscription['entries']))
 	fg.rss_file(filename)
 	
 
@@ -90,11 +89,10 @@ def manageMsg(update, context):
 
 for k, v in SUBSCRIPTION.items():
 	chat_id = SUBSCRIPTION[k]['subscription']
-	r = tele.bot.send_message(chat_id = chat_id, text = 'test')
-	r.delete()
-	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
+	chat = tele.bot.get_chat(chat_id = chat_id)
+	SUBSCRIPTION[k]['channel'] = getFeedChannel(chat)
 	SUBSCRIPTION[k]['entries'] = []
-	SUBSCRIPTION[k]['link'] = 't.me/' + r.chat.username
+	SUBSCRIPTION[k]['link'] = 't.me/' + chat.username
 	for msg_id in range(r.message_id - REWIND, r.message_id):
 		apendRss(chat_id, msg_id)
 
