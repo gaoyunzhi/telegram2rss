@@ -35,7 +35,9 @@ def getFeedChannel(rss_name, chat):
 def editFeedEntry(item, msg, guid):
 	item.guid(guid)
 	print(msg_id, getLinkFromMsg(msg))
-	item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
+	if not (getLinkFromMsg(msg) or getFilePath(msg)):
+		print(msg)
+	item.link(href=getLinkFromMsg(msg) or getFilePath(msg) or guid)
 	item.description(msg.text or getFilePath(msg))
 
 def getEntry(subscription, msg_id):
