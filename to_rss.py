@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from telegram.ext import Updater, MessageHandler, Filters
-from telegram_util import addToQueue, log_on_fail
+from telegram_util import addToQueue, log_on_fail, getFilePath
 import threading
 import yaml
 
@@ -23,10 +23,10 @@ EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 
 def appendRss_(rss_name, file, text):
 	with open('rss/' + rss_name + '.xml', 'a') as f:
-		f.write('test\n') # TODO
+		f.write('test: ' + str(text) + '\n') # TODO
 
 def getSubscription(chat_id):
-	for rss_name, subscriptions in SUBSCRIPTION:
+	for rss_name, subscriptions in SUBSCRIPTION.items():
 		if chat_id in subscriptions:
 			yield rss_name
 
@@ -39,6 +39,7 @@ def apendRss(chat_id, msg_id):
 		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
 	for rss_name in rss_names:
 		appendRss_(rss_name, getFilePath(r), r.text)
+	print(msg_id)
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def _manageMsg(update):
@@ -49,9 +50,9 @@ def _manageMsg(update):
 
 @log_on_fail(debug_group)
 def manageMsg(update, context):
-	threading.Timer(INTERVAL, _manageMsg).start() 
+	threading.Timer(INTERVAL, lambda: _manageMsg(update)).start() 
 
-for msg_id in range(30):
+for msg_id in range(10):
 	apendRss(-1001409716127, msg_id)
 
 tele.dispatcher.add_handler(MessageHandler(Filters.update.channel_posts, manageMsg))
