@@ -25,15 +25,15 @@ with open('SUBSCRIPTION') as f:
 test_channel = -1001159399317
 EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 
-def getFeedChannel(chat):
+def getFeedChannel(rss_name, chat):
 	fg = FeedGenerator()
 	fg.title(chat.title)
-	fg.link(href = 'http://t.me/' + chat.username, rel='self')
+	fg.link('%s/rss/%s.xml' % (CREDENTIALS['host'], rss_name), rel='self')
 	fg.description(chat.description or chat.title)
 	return fg
 
-def editFeedEntry(item, msg, msg_id):
-	item.guid(str(msg_id))
+def editFeedEntry(item, msg, guid):
+	item.guid(guid)
 	print(msg_id, getLinkFromMsg(msg))
 	item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
 	item.description(msg.text or getFilePath(msg))
@@ -56,7 +56,7 @@ def appendRss_(rss_name, msg, msg_id):
 	subscription = SUBSCRIPTION[rss_name]
 	fg = SUBSCRIPTION[rss_name]['channel']
 	item = getEntry(subscription, msg_id)
-	editFeedEntry(item, msg, msg_id)
+	editFeedEntry(item, msg, subscription['link'] + '/' + str(msg_id))
 	print('[DEBUG] saving file')
 	fg.rss_file(filename)
 	print('[DEBUG] file saved')
@@ -94,7 +94,7 @@ for k, v in SUBSCRIPTION.items():
 	chat_id = SUBSCRIPTION[k]['subscription']
 	r = tele.bot.send_message(chat_id = chat_id, text = 'test')
 	r.delete()
-	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
+	SUBSCRIPTION[k]['channel'] = getFeedChannel(k, r.chat)
 	SUBSCRIPTION[k]['entries'] = []
 	SUBSCRIPTION[k]['link'] = 'http://t.me/' + r.chat.username
 	for msg_id in range(r.message_id - REWIND, r.message_id):
