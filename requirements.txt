@@ -1,5 +1,5 @@
 python-telegram-bot
 pyyaml
-telegram_util>=0.0.19
+telegram_util>=0.0.20
 CherryPy
 feedgen
