@@ -6,7 +6,6 @@ from telegram_util import addToQueue, log_on_fail, getFilePath, getLinkFromMsg
 import threading
 import yaml
 from feedgen.feed import FeedGenerator
-from lxml import etree
 import os
 
 INTERVAL = 1
