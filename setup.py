@@ -10,7 +10,7 @@ def kill():
 	for f in RUN_FILES:
 		os.system(template % f)
 
-def onExit():
+def onExit(sig, frame):
 	print('EXITING')
 	kill()
 	print('EXIT')
