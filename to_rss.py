@@ -35,6 +35,7 @@ def getFeedChannel(chat):
 
 def editFeedEntry(item, msg, msg_id):
 	item.id = msg_id
+	print(msg_id, getLinkFromMsg(msg))
 	item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
 	item.description(msg.text or getFilePath(msg))
 
@@ -89,10 +90,11 @@ def manageMsg(update, context):
 
 for k, v in SUBSCRIPTION.items():
 	chat_id = SUBSCRIPTION[k]['subscription']
-	chat = tele.bot.get_chat(chat_id = chat_id)
-	SUBSCRIPTION[k]['channel'] = getFeedChannel(chat)
+	r = tele.bot.send_message(chat_id = chat_id, text = 'test')
+	r.delete()
+	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
 	SUBSCRIPTION[k]['entries'] = []
-	SUBSCRIPTION[k]['link'] = 't.me/' + chat.username
+	SUBSCRIPTION[k]['link'] = 't.me/' + r.chat.username
 	for msg_id in range(r.message_id - REWIND, r.message_id):
 		apendRss(chat_id, msg_id)
 

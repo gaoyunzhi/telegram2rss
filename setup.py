@@ -1,10 +1,22 @@
 import os
 import sys
+from signal import signal, SIGINT
+from sys import exit
+
+def kill():
+	os.system("ps aux | grep ython | grep 'to_rss.py' | awk '{print $2}' | xargs kill -9")
+	os.system("ps aux | grep ython | grep 'rss_server.py' | awk '{print $2}' | xargs kill -9")
+	exit(0)
 
 def setup(arg = ''):
+	if arg == 'kill':
+		os.system("ps aux | grep ython | grep 'to_rss.py' | awk '{print $2}' | xargs kill -9")
+		os.system("ps aux | grep ython | grep 'rss_server.py' | awk '{print $2}' | xargs kill -9")
+		return
+
 	os.system('mkdir rss')
 	
-	RUN_COMMAND = 'nohup python3 -u to_rss.py &'
+	RUN_FILES = ['to_rss', 'rss_server']
 
 	if arg != 'debug':
 		r = os.system('sudo pip3 install -r requirements.txt')
@@ -18,13 +30,15 @@ def setup(arg = ''):
 	except:
 		os.system('sudo pip3 install python-telegram-bot --upgrade') # need to use some experiement feature, e.g. message filtering
 			
-	# kill the old running bot if any. If you need two same bot running in one machine, use mannual command instead
-	os.system("ps aux | grep ython | grep 'to_rss.py' | awk '{print $2}' | xargs kill -9")
+	kill()
+
+	template = "nohup python3 -u %s.py &"
+	for f in RUN_FILES:
+		os.system(template % f)
 
 	if arg.startswith('debug'):
-		os.system(RUN_COMMAND[6:-2])
-	else:
-		os.system(RUN_COMMAND)
+		signal(SIGINT, kill)
+		os.system('tail -F nohup.out')
 
 
 if __name__ == '__main__':
