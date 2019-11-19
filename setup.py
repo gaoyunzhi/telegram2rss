@@ -9,6 +9,9 @@ def kill():
 	template = "sudo ps aux | grep ython | grep '%s.py' | awk '{print $2}' | xargs kill -9"
 	for f in RUN_FILES:
 		os.system(template % f)
+
+def onExit():
+	kill()
 	exit(0)
 
 def setup(arg = ''):
@@ -30,12 +33,13 @@ def setup(arg = ''):
 	except:
 		os.system('sudo pip3 install python-telegram-bot --upgrade') # need to use some experiement feature, e.g. message filtering
 
+	kill()
 	template = "nohup python3 -u %s.py &"
 	for f in RUN_FILES:
 		os.system(template % f)
 
 	if arg.startswith('debug'):
-		signal(SIGINT, kill)
+		signal(SIGINT, onExit)
 		os.system('tail -F nohup.out')
 
 

@@ -28,12 +28,12 @@ EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 def getFeedChannel(chat):
 	fg = FeedGenerator()
 	fg.title(chat.title)
-	fg.link(href = 't.me/' + chat.username)
+	fg.link(href = 'http://t.me/' + chat.username)
 	fg.description(chat.description or chat.title)
 	return fg
 
 def editFeedEntry(item, msg, msg_id):
-	item.id = msg_id
+	item.guid = msg_id
 	print(msg_id, getLinkFromMsg(msg))
 	item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
 	item.description(msg.text or getFilePath(msg))
@@ -42,7 +42,7 @@ def getEntry(subscription, msg_id):
 	entries = subscription['entries']
 	fg = subscription['channel']
 	for entry in entries:
-		if entry.id == msg_id:
+		if entry.guid == msg_id:
 			return entry
 	if len(entries) > LIMIT:
 		entries.pop(0)
@@ -93,7 +93,7 @@ for k, v in SUBSCRIPTION.items():
 	r.delete()
 	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
 	SUBSCRIPTION[k]['entries'] = []
-	SUBSCRIPTION[k]['link'] = 't.me/' + r.chat.username
+	SUBSCRIPTION[k]['link'] = 'http://t.me/' + r.chat.username
 	for msg_id in range(r.message_id - REWIND, r.message_id):
 		apendRss(chat_id, msg_id)
 
