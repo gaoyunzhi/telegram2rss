@@ -9,7 +9,7 @@ from feedgen.feed import FeedGenerator
 from lxml import etree
 
 INTERVAL = 1
-LIMIT = 10
+LIMIT = 3
 
 with open('CREDENTIALS') as f:
 	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
@@ -27,32 +27,36 @@ EXPECTED_ERRORS = ['Message to forward not found', "Message can't be forwarded"]
 def getFeedChannel(chat):
 	fg = FeedGenerator()
 	fg.title(chat.title)
-    fg.link('t.me/' + chat.username)
-    fg.description(chat.description or chat.title)
-    return fg
+	fg.link(href = 't.me/' + chat.username)
+	fg.description(chat.description or chat.title)
+	return fg
 
-def getMsgLink(msg):
-	return 't.me/' + msg.chat.username + '/' + str(msg.message_id)
+def editFeedEntry(item, msg, msg_id):
+	item.id = msg_id
+	item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
+	item.description(msg.text or getFilePath(msg))
 
-def editFeedEntry(item, msg):
-	item.id = getMsgLink(msg)
-    item.link(href=getLinkFromMsg(msg) or getFilePath(msg))
-    item.description(msg.text or getFilePath(msg))
-
-def getEntry(fg, msg):
-	for entry in fg.__feed_entries:
-		if entry.id = getMsgLink(msg):
+def getEntry(subscription, msg_id):
+	entris = subscription['entries']
+	fg = subscription['channel']
+	for entry in entries:
+		if entry.id == msg_id:
 			return entry
-	if len(fg.__feed_entries) > LIMIT:
-		fg.__feed_entries.pop(0)
-	return fg.add_entry()
+	if len(entries) > LIMIT:
+		entries.pop(0)
+		fg.remove_entry(0)
+	entry = fg.add_entry()
+	entries.append(entry)
+	return entry
 
-def appendRss_(rss_name, msg):
+def appendRss_(rss_name, msg, msg_id):
 	filename = 'rss/' + rss_name + '.xml'
+	subscription = SUBSCRIPTION[rss_name]
 	fg = SUBSCRIPTION[rss_name]['channel']
-	item = getEntry(fg, msg)
-	editFeedEntry(fg, msg)
+	item = getEntry(subscription, msg_id)
+	editFeedEntry(item, msg, msg_id)
 	fg.rss_file(filename)
+	print('here')
 
 def getSubscription(chat_id):
 	for rss_name, detail in SUBSCRIPTION.items():
@@ -66,8 +70,9 @@ def apendRss(chat_id, msg_id):
 		return
 	r = tele.bot.forward_message(
 		chat_id = test_channel, message_id = msg_id, from_chat_id = chat_id)
+	return
 	for rss_name in rss_names:
-		appendRss_(rss_name, r)
+		appendRss_(rss_name, r, msg_id)
 
 @log_on_fail(debug_group, EXPECTED_ERRORS)
 def _manageMsg(update):
@@ -85,6 +90,8 @@ for k, v in SUBSCRIPTION.items():
 	r = tele.bot.send_message(chat_id = chat_id, text = 'test')
 	r.delete()
 	SUBSCRIPTION[k]['channel'] = getFeedChannel(r.chat)
+	SUBSCRIPTION[k]['entries'] = []
+	SUBSCRIPTION[k]['link'] = 't.me/' + r.chat.username
 	for msg_id in range(r.message_id - LIMIT * 2, r.message_id):
 		apendRss(chat_id, msg_id)
 

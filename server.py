@@ -41,3 +41,4 @@ conf = {
     },
 }
 cherrypy.quickstart(root, '/', conf)
+print(1)
