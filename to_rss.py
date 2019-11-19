@@ -89,6 +89,7 @@ def _manageMsg(update):
 def manageMsg(update, context):
 	threading.Timer(INTERVAL, lambda: _manageMsg(update)).start() 
 
+print('[DEBUG] INIT')
 for k, v in SUBSCRIPTION.items():
 	chat_id = SUBSCRIPTION[k]['subscription']
 	r = tele.bot.send_message(chat_id = chat_id, text = 'test')
@@ -98,6 +99,7 @@ for k, v in SUBSCRIPTION.items():
 	SUBSCRIPTION[k]['link'] = 'http://t.me/' + r.chat.username
 	for msg_id in range(r.message_id - REWIND, r.message_id):
 		apendRss(chat_id, msg_id)
+print('[DEBUG] INIT END')
 
 tele.dispatcher.add_handler(MessageHandler(Filters.update.channel_posts, manageMsg))
 
