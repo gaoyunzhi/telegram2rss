@@ -3,20 +3,20 @@ import sys
 from signal import signal, SIGINT
 from sys import exit
 
+RUN_FILES = ['to_rss', 'rss_server']
+
 def kill():
-	os.system("ps aux | grep ython | grep 'to_rss.py' | awk '{print $2}' | xargs kill -9")
-	os.system("ps aux | grep ython | grep 'rss_server.py' | awk '{print $2}' | xargs kill -9")
+	template = "ps aux | grep ython | grep '%s.py' | awk '{print $2}' | xargs kill -9"
+	for f in RUN_FILES:
+		os.system(template % f)
 	exit(0)
 
 def setup(arg = ''):
 	if arg == 'kill':
-		os.system("ps aux | grep ython | grep 'to_rss.py' | awk '{print $2}' | xargs kill -9")
-		os.system("ps aux | grep ython | grep 'rss_server.py' | awk '{print $2}' | xargs kill -9")
+		kill()
 		return
 
 	os.system('mkdir rss')
-	
-	RUN_FILES = ['to_rss', 'rss_server']
 
 	if arg != 'debug':
 		r = os.system('sudo pip3 install -r requirements.txt')
