@@ -35,7 +35,7 @@ def getFeedChannel(rss_name, chat):
 def editFeedEntry(item, msg, guid):
 	item.guid(guid)
 	item.link(href=getLinkFromMsg(msg) or getFilePath(msg) or guid)
-	item.description(msg.text or getFilePath(msg))
+	item.description(msg.text or getFilePath(msg) or guid)
 
 def getEntry(subscription, msg_id):
 	entries = subscription['entries']
