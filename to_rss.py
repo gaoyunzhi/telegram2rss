@@ -9,8 +9,8 @@ from feedgen.feed import FeedGenerator
 import os
 
 INTERVAL = 1
-LIMIT = 3
-REWIND = 60 # LIMIT * 2
+LIMIT = 10
+REWIND = LIMIT * 2
 
 with open('CREDENTIALS') as f:
 	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
