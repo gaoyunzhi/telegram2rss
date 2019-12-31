@@ -45,7 +45,7 @@ def getEntry(subscription, msg_id):
 			return entry
 	if len(entries) > LIMIT:
 		entries.pop(0)
-		fg.remove_entry(0)
+		fg.remove_entry(len(entries) - 1)
 	entry = fg.add_entry()
 	entries.append((msg_id, entry))
 	return entry
